@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("partial_pages/headmeta") %>
+    <%- include("../css/project.css.ejs") %>
+
+
+    <% if(parseInt(context.user_privilege) >= 10000) {%>
+    <!-- priority partial view -->
+    <script src="/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: '.tedit',
+            height: 400,
+            plugins: "code image",
+            toolbar: `undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify 
+                        | bullist numlist outdent indent | image code`,
+            images_upload_handler: function (blobInfo, success, failure) {
+                var path = 'uploads/' + blobInfo.filename()
+                var storageRef = firebase.storage().ref(path)
+                var snapshot_holder = null
+                fetch(`data:${blobInfo.blob().type};base64,${blobInfo.base64()}`)
+                    .then((x) => {
+                        return x.blob()
+                    }).then((blob) => {
+                        let task = storageRef.put(blob)
+                        task.on("state_changed",
+                            function progress(snapshot) {
+                                snapshot_holder = snapshot
+                                console.log("progress")
+                            },
+                            function error(err) {
+                                console.log("err")
+                                failure('failed')
+                            },
+                            function complete(x) {
+                                console.log("complete")
+                                snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                                    success(downloadURL)
+                                });
+                            }
+                        )
+                    })
+            }
+        });
+    </script>
+    <%}%>
+    <script>
+        function fadeOut(el){
+        el.style.opacity = 1;
+
+        (function fade() {
+            if ((el.style.opacity -= .1) < 0) {
+                el.style.display = "none";
+                } else {
+                requestAnimationFrame(fade);
+                }
+            })();
+        }
+        // fade in
+        function fadeIn(el, display){
+            el.style.opacity = 0;
+            el.style.display = display || "block";
+
+            (function fade() {
+                var val = parseFloat(el.style.opacity);
+                if (!((val += .1) > 1)) {
+                el.style.opacity = val;
+                requestAnimationFrame(fade);
+                }
+            })();
+        }
+    </script>
+</head>
+
+<body class="">
+    
+    <%- include("partial_pages/header.ejs", {context:context}) %>
+    <div class="e-body">
+        <%- include("partial_pages/topnav.ejs", {context:context, plusBTN: true}) %>
+
+        
+        <%- include("partial_pages/rightnav.ejs", {context:context}) %>
+    </div>
+    <%- include("partial_pages/footer.ejs", {context:context, csrfToken:csrfToken}) %>
+    <!-- e-popup  -->
+    <%- include("partial_pages/epopup.ejs", {context:context}) %>
+
+    <%- include("partial_pages/raindrop.ejs", {context:context}) %>
+
+
+    </body>
+
+</html>

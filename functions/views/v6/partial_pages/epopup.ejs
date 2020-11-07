@@ -1,0 +1,507 @@
+<div class="e-popup-rootwrapper">
+
+</div>
+<div class="e-popup e-popup1 <%= context.adminlogin?"on":"" %>">
+    <div class="e-popup-contentwrapper">
+        <div class="e-popup-content">
+            <div class="e-popup-content-shrink">
+                
+                <div class="e-popup-content-i">
+                    <div>
+                        Email:
+                    </div>
+                    <input type="email" id="f_account" name="email" autocomplete="on">
+                </div>
+                <div class="e-popup-content-i">
+                    <div>
+                        Password:
+                    </div>
+                    <input type="text" id="f_pasword" name="password">
+                </div>
+    
+                <div class="e-popup-content-i" id="btn_signin" style="width: max-content; cursor: pointer;" onclick="sessionLoginUi()">
+                    Sign In
+                </div>
+                <div class="e-popup-content-i e-popup-close" style="width: max-content; cursor: pointer;">
+                    Cancel
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+</div>
+<div class="e-popup e-popup-signup">
+    <div class="e-popup-contentwrapper">
+        <div class="e-popup-content">
+            <div>
+                <div>
+                    Email:
+                </div>
+                <input type="text" id="f_account2" name="email">
+            </div>
+            <div>
+                <div>
+                    Password:
+                </div>
+                <input type="text" id="f_pasword2" name="password">
+            </div>
+
+            <div style="width: max-content; cursor: pointer;margin-left:auto;" onclick="sessionLoginUi()">
+                Sign Up
+            </div>
+            <div class="e-popup-close" style="width: max-content; cursor: pointer;margin-left:auto;">
+                Cancel
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="e_popup_firebackend_model_encap">
+    <div>
+        
+    </div>
+</template>
+
+<template id="e_popup_firebackend_add">
+    <div class="e-popup e-popup-add_XXSSmodelnameSSXX">
+        <div class="e-popup-contentwrapper">
+            <div class="e-popup-content">
+                <div>
+                    <button id="commit_new_XXSSmodelnameSSXX"> Add </button>
+                    <button class="e-popup-close" onclick=""> Cancel </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="e_popup_firebackend_edit">
+    <div class="e-popup e-popup-edit_XXSSmodelnameSSXX ">
+        <div class="e-popup-contentwrapper">
+            <div class="e-popup-content">
+                
+                <div>
+                    <button id="commit_edit_XXSSmodelnameSSXX"> Save </button>
+                    <button class="e-popup-close"> Cancel </button>
+                    <button id="commit_delete_catagory_list" class="e-btn-danger"> Delete </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="e_popup_firebackend_input_string">
+    <div class="e-popup-content-i e-popup-content-icenter">
+        <label for="">XXSSactionSSXX XXSSfieldnameSSXX</label>
+        <input type="text" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX">
+        <br>
+    </div>
+</template>
+<template id="e_popup_firebackend_input_image">
+    <div class="e-popup-content-i e-popup-content-icenter">
+        <label for="">XXSSactionSSXX XXSSfieldnameSSXX</label>
+        <input type="file" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX" accept="image/png, image/jpeg">
+        <br>
+        <img id="input_XXSSactionSSXX_XXSSmodelnameSSXX_imgbody" width="500" src="">
+    </div>    
+</template>
+<template id="e_popup_firebackend_input_relaiton">
+    <div class="e-popup-content-i e-popup-content-icenter">
+        <select id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSrelationSSXX_XXSSfieldnameSSXX" class="firebackend_relation_select">
+            <option value="-1">請選擇主頻道</option>
+        </select>
+    </div>
+</template>
+<template id="e_popup_firebackend_input_tedit">
+    <div class="e-popup-content-i e-popup-content-icenter">
+        <label for="">XXSSactionSSXX XXSSfieldnameSSXX</label>
+        <textarea type="text" class="tedit firebackend_tedit" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX_XXSSidkeySSXX" rows="4" cols="50"></textarea>
+    </div>
+</template>
+
+<script>
+    // e-popup utils
+    let _e_popup_firebackend = function (model_name, interface_schema, relation_list) {
+        this.root_id = "e_popup_firebackend" + this.uuidv4()
+        const model_name_alter = "XXSSmodelnameSSXX"
+        const action_alter = "XXSSactionSSXX"
+        const fieldname_alter = "XXSSfieldnameSSXX"
+        const relation_alter = "XXSSrelationSSXX"
+        const idkey_alter = "XXSSidkeySSXX"
+        
+        
+        this.interface_schema = interface_schema
+        this.model_name = model_name
+        this.relation_list = relation_list
+        
+        this.busy = false
+
+        this.add_file = null
+        this.edit_file = null
+
+        let string_html_model_encap = document.querySelector("#e_popup_firebackend_model_encap").content.firstElementChild.outerHTML
+        let string_html_add = document.querySelector("#e_popup_firebackend_add").content.firstElementChild.outerHTML
+        let string_html_edit = document.querySelector("#e_popup_firebackend_edit").content.firstElementChild.outerHTML
+        let string_html_input_string = document.querySelector("#e_popup_firebackend_input_string").content.firstElementChild.outerHTML
+        let string_html_input_image = document.querySelector("#e_popup_firebackend_input_image").content.firstElementChild.outerHTML
+        let string_html_input_relaiton = document.querySelector("#e_popup_firebackend_input_relaiton").content.firstElementChild.outerHTML
+        let string_html_input_tedit = document.querySelector("#e_popup_firebackend_input_tedit").content.firstElementChild.outerHTML
+
+        string_html_model_encap = string_html_model_encap
+        string_html_add = string_html_add.replaceAll(model_name_alter, this.model_name)
+        string_html_edit = string_html_edit.replaceAll(model_name_alter, this.model_name)
+        
+        
+        let html_model_encap = this.createElementHTMLFromStr(string_html_model_encap)
+        html_model_encap.id = this.root_id
+        let html_add = this.createElementHTMLFromStr(string_html_add)
+        let html_edit = this.createElementHTMLFromStr(string_html_edit)
+        {
+            for(_key in this.interface_schema){
+                let _schema = this.interface_schema[_key]
+                let inputField = null
+                if(_schema.type == "string"){
+                    inputField = string_html_input_string
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'add')
+                                                .replaceAll(fieldname_alter,_key)
+                    inputField = this.createElementHTMLFromStr(inputField)                                                
+                }else if(_schema.type == "image"){ 
+                    inputField = string_html_input_image
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'add')
+                                                .replaceAll(fieldname_alter,_key)
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }else if(_schema.type == "relation"){ 
+                    inputField = string_html_input_relaiton
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'add')
+                                                .replaceAll(fieldname_alter,_key)
+                                                .replaceAll(relation_alter,_schema.relation_code)
+                    inputField = this.createElementHTMLFromStr(inputField)
+                    for(x in this.relation_list){
+                        let _relation = this.relation_list[x]
+                        inputField.querySelector("select").appendChild(this.createElementHTMLFromStr(`<option value="${_relation.code}">${_relation.name}</option>`))
+                    }
+                                                
+                }else if(_schema.type == "tedit"){ 
+                    inputField = string_html_input_tedit
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'add')
+                                                .replaceAll(fieldname_alter,_key)
+                                                .replaceAll(idkey_alter,this.uuidv4())
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }
+
+                html_add.querySelector(".e-popup-content").prepend(inputField)
+            }
+            for(_key in this.interface_schema){
+                let _schema = this.interface_schema[_key]
+                let inputField = null
+                if(_schema.type == "string"){
+                    inputField = string_html_input_string
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'edit')
+                                                .replaceAll(fieldname_alter,_key)
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }else if(_schema.type == "image"){ 
+                    inputField = string_html_input_image
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'edit')
+                                                .replaceAll(fieldname_alter,_key)
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }else if(_schema.type == "relation"){ 
+                    inputField = string_html_input_relaiton
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'edit')
+                                                .replaceAll(fieldname_alter,_key)
+                                                .replaceAll(relation_alter,_schema.relation_code)
+                    inputField = this.createElementHTMLFromStr(inputField)                                                
+                    for(x in this.relation_list){
+                        let _relation = this.relation_list[x]
+                        inputField.querySelector("select").appendChild(this.createElementHTMLFromStr(`<option value="${_relation.code}">${_relation.name}</option>`))
+                    }                                                
+                    
+                }else if(_schema.type == "tedit"){ 
+                    inputField = string_html_input_tedit
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'edit')
+                                                .replaceAll(fieldname_alter,_key)
+                                                .replaceAll(idkey_alter,this.uuidv4())
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }
+                html_edit.querySelector(".e-popup-content").prepend(inputField)
+            }
+        }
+
+        // append
+        html_model_encap.appendChild(html_add)
+        html_model_encap.appendChild(html_edit)
+        document.querySelector(".e-popup-rootwrapper").appendChild(html_model_encap)
+        this.loadScript()
+    }
+    _e_popup_firebackend.prototype.getDataObjFromUI = function(rootqstr,action,downloadURL) {
+        let _data = {}
+        for(_key in this.interface_schema){
+            let schema = this.interface_schema[_key]
+            if(schema.type == "string"){
+                _data[_key] =  document.querySelector(rootqstr+`#input_${action}_${this.model_name}_${_key}`).value
+            }else if(schema.type == "relation" ){
+                if(schema.meta=="self"){
+                    _data["parent_code"] =  document.querySelector(rootqstr+`#input_${action}_${this.model_name}_${schema.relation_code}_${_key}`).value
+                }else{
+                    _data[schema.relation_code+"_code"] =  document.querySelector(rootqstr+`#input_${action}_${this.model_name}_${schema.relation_code}_${_key}`).value
+                }
+            }else if(schema.type == "tedit"){     
+                let tedit_id = document.querySelector(rootqstr).querySelector(`[id^='input_${action}_${this.model_name}_${_key}_']`).id
+                _data[_key] = tinyMCE.get(tedit_id).getContent()
+            }
+        }
+        _data["img"] = downloadURL
+        return _data
+    }
+    _e_popup_firebackend.prototype.loadScript = function() {
+        document.querySelector(`#input_add_${this.model_name}_img`).addEventListener("change",(evt)=>{
+            let _file = evt.target.files[0]
+            _file.name = Date.now()+"_"+_file.name
+            this.add_file = _file
+        })
+        document.querySelector(`#input_edit_${this.model_name}_img`).addEventListener("change",(evt)=>{
+            let _file = evt.target.files[0]
+            _file.name = Date.now()+"_"+_file.name
+            this.edit_file = _file
+            document.querySelector(`#input_edit_${this.model_name}_imgbody`).src = ""
+        })
+        
+        document.querySelector(`#commit_new_${this.model_name}`).addEventListener("click", async (el) => {
+            var rootqstr = `.e-popup-add_${this.model_name} `
+            loadingSVG.on(`#commit_new_${this.model_name}`)
+            
+            var success_afdfda = (downloadURL)=>{
+                
+                //_data["img"] = downloadURL
+                fetch_post(`/add_${this.model_name}`,
+                {
+                    _csrf: csrfToken,
+                    data: this.getDataObjFromUI(rootqstr,"add",downloadURL)
+                })
+                .then((response) => {
+                    loadingSVG.off()
+                    return response.json();
+                }).then((jsonData) => {
+                    //e_popup1.close(`.e-popup-add_${this.model_name}`)
+                    if(jsonData=="authDenied"){
+                        alert("authDenied")
+                        throw "authDenied"
+                    }
+                    this.close()
+                    location.reload()
+                }).catch((err) => {
+                    alert(err)
+                    console.log('錯誤:', err);
+                });
+            }
+            if(!this.add_file){
+                success_afdfda("")
+                return
+            }
+            let storageRef = firebase.storage().ref('uploads/'+this.add_file.name)
+            let task = storageRef.put(this.add_file)
+            let snapshot_holder = null
+            task.on("state_changed",
+                function progress(snapshot) {
+                    snapshot_holder = snapshot
+                    console.log("progress")
+                },
+                function error(err) {
+                    console.log("err")
+                    failure('failed')
+                },
+                function complete(x) {
+                    console.log("complete")
+                    snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                        success_afdfda(downloadURL)
+                    });
+                }
+            )
+        })
+        document.querySelector(`#commit_edit_${this.model_name}`).addEventListener("click", async (el) => {
+            var rootqstr = `.e-popup-edit_${this.model_name} `
+            loadingSVG.on(`#commit_edit_${this.model_name}`)
+            var success_fdsgh = (downloadURL) => { //downloadURL must provide
+                fetch_post(`/update_${this.model_name}`,
+                {
+                    _csrf: csrfToken,
+                    d_key: due_data_sdadkjj.d_key,
+                    data:this.getDataObjFromUI(rootqstr,"edit",downloadURL)
+                })
+                .then((response) => {
+                    loadingSVG.off()
+                    return response.json();
+                }).then((jsonData) => {
+                    //e_popup1.close(`.e-popup-add_${this.model_name}`)
+                    if(jsonData=="authDenied"){
+                        alert("authDenied")
+                        throw "authDenied"
+                    }
+                    this.close()
+                    location.reload()
+                }).catch((err) => {
+                    alert(err)
+                    console.log('錯誤:', err);
+                });
+            }
+
+            if(!this.edit_file){
+                success_fdsgh(due_data_sdadkjj.img)
+                return
+            }
+            let storageRef = firebase.storage().ref('uploads/'+this.edit_file.name)
+            let task = storageRef.put(this.edit_file)
+            let snapshot_holder = null
+            task.on("state_changed",
+                function progress(snapshot) {
+                    snapshot_holder = snapshot
+                    console.log("progress")
+                },
+                function error(err) {
+                    console.log("err")
+                    failure('failed')
+                },
+                function complete(x) {
+                    console.log("complete")
+                    snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                        success_fdsgh(downloadURL)
+                    });
+                    
+                }
+            )
+        })
+        
+        if(document.querySelector(`.btn_add_${this.model_name}`)){
+            document.querySelector(`.btn_add_${this.model_name}`).addEventListener("click",  (el) => {
+                this.open(`.e-popup-add_${this.model_name}`)
+            })
+        }
+        if(document.querySelector(`.e-popup-edit_${this.model_name}`)){
+            let rootqstr = `.e-popup-edit_${this.model_name} `
+            let action = "edit"
+            document.querySelectorAll(`.btn_edit_${this.model_name}`).forEach((el) => {
+                el.addEventListener("click",  (ev) => {
+                    // refresh
+                    due_data_sdadkjj = JSON.parse(ev.currentTarget.dataset.data)
+                    for( _key in due_data_sdadkjj){
+                        if( this.interface_schema[_key] || _key.includes("_code") ){
+                            let qstr = ''
+                            let el = null
+                            if(this.interface_schema[_key].type == "tedit"){
+                                el = document.querySelector(rootqstr).querySelector(`[id^='input_${action}_${this.model_name}_${_key}_']`)
+                            
+                            }else if(this.interface_schema[_key].relation_code){
+                                qstr = `#input_edit_${this.model_name}_${this.interface_schema[_key].relation_code}_${_key}`
+                                el = document.querySelector(qstr)
+                            }else{
+                                qstr = `#input_edit_${this.model_name}_${_key}`
+                                el = document.querySelector(qstr)
+                            }       
+                            
+                            if(el.type == "text"){
+                                el.value = due_data_sdadkjj[_key]
+                            }else if(el.classList.contains("firebackend_relation_select")){
+                                if(!due_data_sdadkjj[_key])due_data_sdadkjj[_key] = "-1"
+                                el.value = due_data_sdadkjj[_key]
+                            }else if(el.classList.contains("firebackend_tedit")){
+                                let HTMLcontent = due_data_sdadkjj[_key] || ""
+                                let tedit_id = document.querySelector(rootqstr).querySelector(`[id^='input_${action}_${this.model_name}_${_key}_']`).id
+                                tinyMCE.get(tedit_id).setContent(HTMLcontent)
+                            }
+                        }
+                    }
+                    //document.querySelector(`#input_edit_${this.model_name}_name`).value = due_data_sdadkjj['name']
+                    document.querySelector(`#input_edit_${this.model_name}_imgbody`).src = due_data_sdadkjj['img']
+                    this.open(`.e-popup-edit_${this.model_name}`)
+                })
+            })
+        }
+        if(document.querySelector(`#commit_delete_${this.model_name}_list`)){
+            document.querySelector(`#commit_delete_${this.model_name}_list`).addEventListener("click",  ()=> {
+                var rootqstr = ".sdf"
+                loadingSVG.on(`#commit_delete_${this.model_name}_list`)
+                fetch_post(`/delete_${this.model_name}`,
+                    {
+                        _csrf: csrfToken,
+                        d_key: due_data_sdadkjj.d_key,
+                        data:{}
+                    })
+                    .then((response) => {
+                        loadingSVG.off()
+                        return response.json();
+                    }).then((jsonData) => {
+                        if(jsonData=="authDenied"){
+                            alert("authDenied")
+                            throw "authDenied"
+                        }
+                        location.reload()
+                    }).catch((err) => {
+                        alert(err)
+                        console.log('錯誤:', err);
+                    });
+            })
+        }
+        document.querySelectorAll(`#${this.root_id} .e-popup-close`).forEach((el)=>{
+            el.addEventListener("click", ()=>{
+                //el.closest(`#${root_id}`)
+                this.close()
+            })
+        })
+    }
+    _e_popup_firebackend.prototype.createElementHTMLFromStr = function (htmlString) {
+        var div = document.createElement('div');
+        div.innerHTML = htmlString.trim();
+        return div.firstChild; 
+    }
+    _e_popup_firebackend.prototype.uuidv4 = function() {
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+    }
+    _e_popup_firebackend.prototype.open = function (qstr) {
+        if(this.busy){
+            return false
+        }
+        this.busy = true
+        document.querySelector(qstr).classList.add("stage")
+        setTimeout(()=>{
+            document.querySelector(qstr).classList.remove("stage")
+            document.querySelector(qstr).classList.add("on")
+        },100)
+        document.querySelector("html").classList.add("no-scroll")
+        document.querySelector("body").classList.add("no-scroll")
+        setTimeout(()=>{
+            this.busy = false
+        },1200)
+    }
+    _e_popup_firebackend.prototype.close = function () {
+        document.querySelector(`#${this.root_id} .on`).classList.remove("on")
+        document.querySelector("html").classList.remove("no-scroll")
+        document.querySelector("body").classList.remove("no-scroll")
+    }
+    <% if(context['ssr_data']['schema_key']){ %>
+    <% context['ssr_data']['schema_key'].forEach((key)=>{ %>
+        <%
+            let selt_uischema_obj = Object.values(context['ssr_data'][`${key}_uischema`])
+            let relation_code = selt_uischema_obj
+                .filter((x) => {return (typeof x.relation_code == "string" )  })[0].relation_code// && x.meta != "self"
+            console.log(relation_code[0].relation_code)    
+            console.log("ssssssssss")
+        %>
+        new _e_popup_firebackend("<%= key%>"
+            ,<%- JSON.stringify(context.ssr_data[`${key}_uischema`]) %> 
+            ,<%- JSON.stringify(context.ssr_data[`${relation_code}_list`]) %>
+        )
+    <%})%>
+    <% } %>
+    
+    
+</script>
+

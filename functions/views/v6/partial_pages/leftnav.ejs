@@ -1,0 +1,39 @@
+<div class="e-body-leftnav">
+    <% if(context.user_privilege >= 4) {%>
+        <% if(context.ssr_data.catagory_list) {%>
+            <% context.ssr_data.catagory_list.forEach(function(el){ %>
+                <div class="e-body-leftnav-i <%= ((el.parent_code)&&(el.parent_code!="-1"))?"depth1":"" %>" data-code="<%= el.code %>"><%= el.name %>
+                    <div class="e-icon-plus btn_edit_catagory" data-data="<%= JSON.stringify(el) %>">
+                        <svg style="display: inline-block;width: 30px;height: 30px;">
+                            <use href="#svg__edit-round"></use>
+                        </svg>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    <% } %>
+    <% if(context.user_privilege >= 4) {%>
+        <% if(typeof plusBTN !== 'undefined' && plusBTN){ %>
+            <div class="e-body-leftnav-i btn_add_catagory">
+                <div style="display: flex;align-items: center;">
+                    Add
+                </div>
+                <div class="e-icon-plus">
+                    <svg style="display: inline-block;width: 30px;height: 30px;">
+                        <use href="#svg__edit-plus"></use>
+                    </svg>
+                </div>
+            </div>
+        <% } %>
+    <% } %>
+</div>
+<script>
+    document.querySelectorAll(".e-body-leftnav-i").forEach((el) => {
+        el.addEventListener('click', function(){
+            var elmnt = document.querySelector(".e-catagoryandphone-wrapper-"+el.dataset.code);
+            elmnt.scrollIntoView({behavior: "smooth", block: "start"});
+        })
+    })
+    
+    
+</script>

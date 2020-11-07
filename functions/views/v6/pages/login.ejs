@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("../partial_pages/headmeta") %>
+    <%- include("../../css/project.css.ejs") %>
+</head>
+
+<body>
+    
+    <%- include("../partial_pages/header.ejs", {context:context}) %>
+    <div class="e-body">
+        <%- include("../partial_pages/leftnav.ejs", {context:context, plusBTN: true}) %>
+        <div class="e-body-maincontent">
+
+            <div class="e-post-itemwrapper">
+                <% if(parseInt(context.user_privilege) >= 4) {%>
+                <div class="e-post-item btn_editpost">
+                    <div class="e-icon-plus">
+                        <svg style="display: inline-block;width: 30px;height: 30px;">
+                            <use href="#svg__edit-round"></use>
+                        </svg>
+                    </div>
+                </div>
+                <% }; %>
+
+            </div>
+        </div>
+        <%- include("../partial_pages/rightnav.ejs", {context:context}) %>
+    </div>
+    <%- include("../partial_pages/footer.ejs", {context:context}) %>
+    <%- include("../partial_pages/epopup.ejs", {context:context}) %>
+
+    </body>
+
+</html>

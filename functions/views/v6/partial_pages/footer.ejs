@@ -1,0 +1,260 @@
+
+<% if(parseInt(context.user_privilege) >= 4) {%>
+    <!-- priority partial view -->
+    <script src="/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: '.tedit',
+            height: 400,
+            plugins: "code image codesample",
+            toolbar: `undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify 
+                        | bullist numlist outdent indent | image code | codesample | fontsizeselect`,
+            images_upload_handler: function (blobInfo, success, failure) {
+                var path = 'uploads/' + blobInfo.filename()
+                var storageRef = firebase.storage().ref(path)
+                var snapshot_holder = null
+                fetch(`data:${blobInfo.blob().type};base64,${blobInfo.base64()}`)
+                    .then((x) => {
+                        return x.blob()
+                    }).then((blob) => {
+                        let task = storageRef.put(blob)
+                        task.on("state_changed",
+                            function progress(snapshot) {
+                                snapshot_holder = snapshot
+                                console.log("progress")
+                            },
+                            function error(err) {
+                                console.log("err")
+                                failure('11111122')
+                            },
+                            function complete(x) {
+                                console.log("complete")
+                                snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                                    success(downloadURL)
+                                });
+                            }
+                        )
+                    })
+            }
+        });
+    </script>
+    <%}%>
+<script src="https://www.gstatic.com/firebasejs/7.21.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-storage.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "--",
+        authDomain: "--",
+        databaseURL: "--",
+        projectId: "--",
+        storageBucket: "--",
+        messagingSenderId: "--",
+        appId: "--",
+        measurementId: "--"
+    };
+    firebase.initializeApp(firebaseConfig);
+</script>
+<script>
+    const csrfToken = "<%= csrfToken %>" //getCookie('csrfToken')
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    function fetch_post(url, obj) {
+        return fetch(url, {
+            body: JSON.stringify(obj), // must match 'Content-Type' header
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            headers: {
+                'user-agent': 'Mozilla/4.0 MDN Example',
+                'content-type': 'application/json'
+            },
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // manual, *follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+        })
+    }
+    async function sessionLoginUi() {
+        var userEmail = document.getElementById("f_account").value;
+        var userPass = document.getElementById("f_pasword").value;
+        loadingSVG.on(".e-popup1 #btn_signin")
+        
+
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
+        // When the user signs in with email and password./
+        firebase.auth().signInWithEmailAndPassword(userEmail, userPass).then(user => {
+            // Get the user's ID token as it is needed to exchange for a session cookie.
+            return user.user.getIdToken().then(idToken => {
+                // Session login endpoint is queried and the session cookie is set.
+                // CSRF protection should be taken into account.
+                // ...
+                loadingSVG.off()
+                return sessionLogin('/sessionLogin', idToken, csrfToken, user.user.uid, user.user.email);
+            }).then((x) => {
+                location.reload()
+            }).cache((e) => {
+                alert("log failed")
+                loadingSVG.off()
+            })
+        })
+    }
+
+
+    function sessionLogin(url, idToken, csrfToken, uid, email) {
+        return fetch(url, {
+            body: JSON.stringify({ idToken: idToken, csrfToken: csrfToken, uid: uid, email: email }), // must match 'Content-Type' header
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            headers: {
+                'user-agent': 'Mozilla/4.0 MDN Example',
+                'content-type': 'application/json'
+            },
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // manual, *follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+        })
+    }
+    if(document.querySelector(".e-popup-close")){
+        document.querySelector(".e-popup-close").addEventListener("click", function (ev) {
+            ev.target.closest(".e-popup").classList.toggle("on")
+        })
+    }
+    // window.onunhandledrejection = function(e){
+    //     console.log("err1")
+    //     loadingSVG.off()
+    //     return true
+    // };
+    // window.onerror = function (msg, url, line) {
+    //     console.log("err2")
+    //     loadingSVG.off()
+    //     return true
+    // };
+    // window.addEventListener('error', function (evt) {
+    //     console.log("err3") 
+    //     console.log(evt); // has srcElement / target / etc
+        
+    // });
+    
+
+</script>
+<div class="e-footer">
+    <div class="e-footer-mailcontact">
+        <svg style="
+        width: 17px;
+        top: 3px;
+        left: 0px;
+        height: 17px;
+        position: relative;
+        ">
+            <use href="#svg__mail"></use>
+        </svg>
+        AshenOne
+    </div>
+    
+</div>
+
+<script>
+	var contextual_CssVariable_Loader = function(fn_after){
+		this.fn_after = fn_after
+		if(!this.fn_after){
+			this.fn_after = function(){}
+		}
+		// function init
+		this.update__css_var_pos = function(el){
+			document.querySelectorAll("[class*=css-var-pos]").forEach(function(el){
+				var name = el.classList.toString().match(/css-var-posY-./)[0]
+  			document.documentElement.style.setProperty("--"+name, el.getBoundingClientRect().y + "px");
+			})
+			this.fn_after()
+  	}.bind(this)
+  	this.ev_touch = function(ev){
+  		let x = null
+  		let y = null
+  		if(ev.touches[0]){
+  			x = ev.touches[0].clientX;
+  			y = ev.touches[0].clientY;
+  		}else if(!ev.touches[0]){
+  			x = ev.changedTouches[0].clientX
+  			y = ev.changedTouches[0].clientY
+  		}
+  		document.documentElement.style.setProperty('--mouse-screen-x', x + "px");
+			document.documentElement.style.setProperty('--mouse-screen-y', y + "px");
+			this.fn_after()
+  	}.bind(this)
+
+	}
+	contextual_CssVariable_Loader.prototype.init = function(){
+		{
+			// asap value
+			document.documentElement.style.setProperty('--scroll-y', window.screenTop + "px");
+			document.documentElement.style.setProperty('--screen-width', screen.availWidth + "px");
+			document.documentElement.style.setProperty('--screen-height', screen.availHeight + "px");
+			this.fn_after()
+		}
+
+		{
+			// events
+			document.addEventListener('readystatechange', (ev) => {
+			  if(document.readyState=="complete" || document.readyState=="interactive"){
+			  	this.update__css_var_pos()
+			  }
+			});
+			document.addEventListener('DOMContentLoaded', (ev) => {
+				this.update__css_var_pos()
+			});
+			window.addEventListener('resize',(ev)=>{
+				let width = screen.availWidth
+				let height = screen.availHeight
+				document.documentElement.style.setProperty('--screen-width', width + "px");
+				document.documentElement.style.setProperty('--screen-height', height + "px");
+				this.fn_after()
+            })
+            
+            window.addEventListener("scroll",(ev)=>{
+                let top = ev.target.scrollTop || window.pageYOffset
+                document.documentElement.style.setProperty('--scroll-y', top + "px");
+                this.fn_after()
+            })
+            
+			
+			window.addEventListener('mousemove',(ev)=>{
+				let x = ev.clientX
+				let y = ev.clientY
+				document.documentElement.style.setProperty('--mouse-screen-x', x + "px");
+				document.documentElement.style.setProperty('--mouse-screen-y', y + "px");
+				this.fn_after()
+			})
+
+			window.addEventListener('touchstart', this.ev_touch)
+			window.addEventListener('touchmove', this.ev_touch)
+			window.addEventListener('touchend', this.ev_touch)
+		}
+	}
+	var cssVariable_callback = function(){
+		let clamp = function(number, min, max) {
+	  	return Math.max(min, Math.min(number, max));
+		}
+		let remove_px__to_int = function(str){
+			return parseInt(str.replace("px",""))
+		}
+
+    let aa_getter = getComputedStyle(document.documentElement)
+		let mouse_screen_y = remove_px__to_int(aa_getter.getPropertyValue('--mouse-screen-y'));
+		let scroll_y = remove_px__to_int(aa_getter.getPropertyValue('--scroll-y'));
+		let css_var_posY_1 = remove_px__to_int(aa_getter.getPropertyValue('--css-var-posY-1'));
+		let css_var_posY_2 = remove_px__to_int(aa_getter.getPropertyValue('--css-var-posY-2'));
+		if(!mouse_screen_y){ mouse_screen_y = 0}
+
+		document.documentElement.style.setProperty("--gblock-pos-top", clamp(mouse_screen_y + scroll_y ,css_var_posY_1,css_var_posY_2) + "px");
+
+		// top: clamp(var(--css-var-posY-1), calc(var(--mouse-screen-y ) + var(--scroll-y)),var(--css-var-posY-2) );
+	}
+	var contextual_CssVariable_Loader1 = new contextual_CssVariable_Loader(cssVariable_callback)
+	contextual_CssVariable_Loader1.init()
+
+
+</script>

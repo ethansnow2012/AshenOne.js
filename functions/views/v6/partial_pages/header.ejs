@@ -1,0 +1,123 @@
+<div class="e-header">
+    <a class="e-header-left" href="/" style="font-family: EBGaramond;">
+        codeborne
+    </a>
+    
+    <% if(context.adminpage) {%>
+    <div class="e-header-right">
+        <svg style="display: inline-block;height:30px; width: 30px;">
+            <use href="#svg__avatar">
+            </use>
+        </svg>
+
+        <div class="e-dropdown">
+            <div class="e-dropdown-inner">
+                <div class="e-dropdown-i" id="e-header-logout" onclick="logout()"
+                    style="display: <%= context.logedin?'':'none' %>;">
+                    Log Out
+                </div>
+                <div class="e-dropdown-i" id="e-header-login" style="display: <%= context.logedin?'none':'' %>;">
+                    Log In
+                </div>
+                <div class="e-dropdown-i" id="e-header-signup" onclick="signup()"
+                    style="display: <%= context.logedin?'none':'' %>;">
+                    Sign Up
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }%>
+</div>
+<script>
+    if(document.querySelector("#e-header-login")){
+        document.querySelector("#e-header-login").addEventListener("click", function () {
+            document.querySelector(".e-popup1").classList.add("on")
+            return
+        })
+    }
+    if(document.querySelector("#e-header-signup")){
+        document.querySelector("#e-header-signup").addEventListener("click", function () {
+            document.querySelector(".e-popup-signup").classList.add("on")
+            return
+        })
+    }
+    
+    // component script
+    if(document.querySelector(".e-dropdown")){
+        document.querySelectorAll(".e-dropdown").forEach((el) => {
+            el.parentElement.addEventListener("click", function (ev) {
+                el.classList.toggle("on")
+                var fn_click = function (ev) {
+                    if (!ev.target.closest(".e-dropdown.on")) {
+                        el.classList.remove("on")
+                        window.removeEventListener("click", fn_click);
+                    }
+                }
+                window.addEventListener("click", fn_click)
+                ev.stopPropagation()
+            })
+
+        })
+    }
+    
+
+    function signup() {
+        let account = document.querySelector("#f_account").value
+        let password = document.querySelector("#f_pasword").value
+        firebase
+            .auth()
+            .createUserWithEmailAndPassword(account, password)
+            .catch(function (error) {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+            });
+    }
+    function login() {
+        var userEmail = document.getElementById("f_").value;
+        var userPass = document.getElementById("password_field").value;
+        firebase.auth().signInWithEmailAndPassword(userEmail, userPass).catch(function (error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+
+            window.alert("Error : " + errorMessage);
+        });
+    }
+    function logout() {
+        loadingSVG.on("#e-header-logout")
+        fetch("/sessionLogout", {
+            body: JSON.stringify({ csrfToken: csrfToken }), // must match 'Content-Type' header
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            headers: {
+                'user-agent': 'Mozilla/4.0 MDN Example',
+                'content-type': 'application/json'
+            },
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // manual, *follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+        }).then((x) => {
+            loadingSVG.off()
+            location.reload()
+        })
+    }
+    var _loadingSVG =  function() {
+        this.state = "off"
+        this.targetEl = null
+    }
+    _loadingSVG.prototype.on = function(qstr){
+        let el = document.querySelector(qstr)
+        this.targetEl = el
+        el.innerHTML = el.innerHTML + `<svg style="display: inline-block;height:1em; width: 1em;">
+                <use href="#svg__loading_round">
+                </use>
+            </svg>`
+    }
+    _loadingSVG.prototype.off = function(){
+        if(this.targetEl.querySelector("svg")){
+            this.targetEl.querySelector("svg").remove()
+        }
+        this.targetEl = null
+    }
+    var loadingSVG = new _loadingSVG()
+</script>

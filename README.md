@@ -116,7 +116,7 @@ Resolver(graphql) is not yet functional
 
 Document:
 
-# <field name>: { type: GraphQLString },
+# \<field name\>: { type: GraphQLString },
 String type
 
 # <field name>: { type: GraphQLString, editable: true },

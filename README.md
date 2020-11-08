@@ -1,8 +1,9 @@
 ## A web app template on firebase with fully declarative CMS.
 =======================
+
 1.
   - copy local file
-    - remove .git file for savety
+    - remove .git file for safety
   - create new github repo
   - create firebase application(web)
 2. 
@@ -33,3 +34,107 @@
   - edit decodedClaims.email=="xxxxx" in factory__express_handle
   - firebase target:apply hosting app <project name>
   - storage.rules(local)
+
+=======================
+
+## Example:
+Declare the DB schema in "~/functions/index.js" as below.
+Then login via "localhost:5000/adminee/login".
+Then the CMS will be available in "localhost:5000/adminee/xxxx".
+```
+let fullDelare = {
+    third:{
+        model_name: "third",
+        uimenu:true,
+        schema: () => ({
+            name: { type: GraphQLString, editable: true },
+            code: { type: GraphQLString },
+            parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"third", meta:"self" },
+            status: { type: GraphQLString },
+            createTime: { type: GraphQLString },
+            createBy_uid: { type: GraphQLString },
+            img:{ type: GraphQLString, editable: true, uitype:"image" },
+            d_key: { type: GraphQLString },
+            
+        })
+    },
+    catagory:{
+        model_name: "catagory",
+        uimenu:true,
+        schema: () => ({
+            name: { type: GraphQLString, editable: true },
+            code: { type: GraphQLString },
+            parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"catagory", meta:"self" },
+            status: { type: GraphQLString },
+            createTime: { type: GraphQLString },
+            createBy_uid: { type: GraphQLString },
+            img:{ type: GraphQLString, editable: true, uitype:"image" },
+            d_key: { type: GraphQLString },
+            phoneInfo:{
+                type: GraphQLList(schema_manager.tHolder["phoneInfo"]), // mutually dependent
+                resolve: async (parent, args) => {  //wrong
+                    let rtn = []
+                    let snapshot = await storedb.collection('posts')
+                        .where('channels_sub', 'array-contains', parent.code)//
+                        .get();
+                    snapshot.forEach((x) => {
+                        rtn.push(x.data())
+                    })
+                    return rtn
+                }
+            }
+        })
+    },
+    phoneInfo:{
+        model_name: "phoneInfo",
+        uimenu:true,
+        schema: () => ({
+            modelText1: { type: GraphQLString, editable: true },
+            catagory_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"catagory" },
+            modelText2: { type: GraphQLString, editable: true },
+            modelText2_price: { type: GraphQLString, editable: true },
+            price1: { type: GraphQLString, editable: true},
+            price2: { type: GraphQLString, editable: true},
+            price3: { type: GraphQLString, editable: true},
+            price4: { type: GraphQLString, editable: true},
+            img: { type: GraphQLString, editable: true, uitype:"image" },
+            content: { type: GraphQLString, editable: true, uitype:"htmlContent" },
+            status: { type: GraphQLString },//GraphQLNonNull is not working now
+            createTime: { type: GraphQLString },
+            createBy_uid: { type: GraphQLString },
+            d_key: { type: GraphQLString }
+        })
+    }
+}
+```
+Worning: 
+Resolver(graphql) is not yet functional
+```
+
+
+```
+
+Document:
+
+# <field name>: { type: GraphQLString },
+String type
+
+# <field name>: { type: GraphQLString, editable: true },
+String that can be edited
+
+# <field name>: { type: GraphQLString, editable: true, uitype:"image" },
+String field that stores the url of the image
+
+# d_key: { type: GraphQLString },
+String field that is used to store the key auto-generate by forestore
+
+# <field name>: { type: GraphQLString, editable: true, uitype:"htmlContent" },
+HTML string field that is used generate via tinyMCE
+
+# parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"catagory", meta:"self" }
+Relation that refers to self.
+
+# <other model>_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"<relation code>" },
+Relation that refers to other model
+
+

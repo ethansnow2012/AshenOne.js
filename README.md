@@ -1,4 +1,4 @@
-# Beta
+# Ashenone.js(Beta)
 :warning: ** This project is under construction. Feature lacks. Do not use in production unless you understand this project. **: Be very careful here!
 
 ## A web app template on firebase with fully declarative CMS.

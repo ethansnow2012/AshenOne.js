@@ -19,21 +19,48 @@
   - 登入方式 (email)
     - create user && remember the email and password or take notes
   - firestore 開啟
+    - 地區選US1
   - firestorage 開啟
-    - firestorage rule
+    - firestorage rule in storage.rules file
   - firebase hosting 開啟
+   - replace "project_name" in codebase with actual project id
    - CLI: firebase login
-   - CLI: firebase init
+   - CLI: firebase init (do not overwrite rule, not single-page)
+    ◉ Database: Deploy Firebase Realtime Database Rules
+    ◉ Firestore: Deploy rules and create indexes for Firestore
+    ◉ Functions: Configure and deploy Cloud Functions
+❯   ◉ Hosting: Configure and deploy Firebase Hosting sites
+    ◉ Storage: Deploy Cloud Storage security rules
+    ```
+    "hosting": [
+      {
+        "target":"app",
+        "public": "public",
+        "ignore": [
+          "firebase.json",
+          "**/.*",
+          "**/node_modules/**"
+        ],
+        "rewrites": [
+          {
+            "source": "**", 
+            "function": "app"  
+          }
+        ]
+      }
+    ]
+    ```
    - CLI: firebase deploy
+   
   - firebase functions 開啟 
     - npm install -g firebase-tools
     - make sure "hosting": { rewrites... } in firebase.json
   - replace adminsdk key(json file) in Settings>>服務帳戶>>admin.initializeApp
-  - replace firebaseConfig (in frontend) (copy from firebase console) in 'Firebase SDK snippet' >> 設定
+  - replace firebaseConfig (shows when start firebase webapp) (copy from firebase console) in 'Firebase SDK snippet' >> 設定
   - bill plan 升級
   -  .firebaserc 指定專案
 4. firebase deploy !!!!!!!!
-  - make sure /public/index.html not exist
+  - make sure /public/index.html not exist (rename it)
   - edit decodedClaims.email=="xxxxx" in factory__express_handle
   - firebase target:apply hosting app <project name>
   - storage.rules(local)

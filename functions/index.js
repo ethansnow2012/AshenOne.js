@@ -93,13 +93,24 @@ let fullDelare = {
             phoneInfo:{
                 type: GraphQLList(schema_manager.tHolder["phoneInfo"]), // mutually dependent
                 resolve: async (parent, args) => {  //wrong
+                    
                     let rtn = []
-                    let snapshot = await storedb.collection('posts')
-                        .where('channels_sub', 'array-contains', parent.code)//
-                        .get();
+                    var _collection = storedb.collection("phoneInfo_list");//.where('createBy_uid', '==', args.uid)
+                    
+                    if(false){    
+                        _collection = _collection.where("createBy_uid", "==", args.uid)
+                    }else{
+                        _collection = _collection.where("status", "==", "onWeb")
+                    }
+                    
+                    const snapshot = await _collection.get();
                     snapshot.forEach((x) => {
-                        rtn.push(x.data())
+                        let data = x.data()
+                        data['d_key'] = x.id //!!                           
+                        rtn.push(data)
                     })
+                    rtn = rtn.filter((x) => x.status == define_status.onWeb)
+                    rtn = rtn.sort((a,b)=> a.createTime._seconds < b.createTime._seconds)
                     return rtn
                 }
             }
@@ -127,13 +138,21 @@ let fullDelare = {
     }
 }
 
-let get_archFields_keyString = (fn_XXX_archFields)=>{
+let get_archFields_keyString = (fn_XXX_archFields, fullDeclare, mode=2)=>{
     let _str = ""
     for(x in _temp_obj = fn_XXX_archFields()){
+        let tempStr1 = ""
         if(_temp_obj[x].hasOwnProperty("resolve")){
-            continue;
+            if(mode==1){
+                continue;
+            }
+            tempStr1 = `${x} {
+                ${get_archFields_keyString(fullDeclare[x].schema, fullDeclare, 1)} // "1" for recursive-exit
+            }`
+        }else{
+            tempStr1 = x
         }
-        _str += x + " "
+        _str += tempStr1 + " "
     }
     return _str
 }
@@ -291,7 +310,7 @@ _schema_manager.prototype.schema_factory = function(delare_name){
         return graphql.graphql(schema, `
         {
             ${sname}_list{
-                ${get_archFields_keyString(slf.schema)}
+                ${get_archFields_keyString(slf.schema, fullDelare)}
             }
         }
         `).then((x) => {

@@ -1,6 +1,13 @@
 # Ashenone.js(Beta)
 :warning: ** This project is under construction. Feature lacks. Do not use in production unless you understand this project. **: Be very careful here!
 
+
+## Commends
+
+- firebase login --interactive
+- firebase login --reauth --interactive
+- host locally
+   - NODE_ENV=development firebase serve --only functions,hosting
 ## A web app template on firebase with fully declarative CMS.
 =======================
 
@@ -146,25 +153,25 @@ Resolver(graphql) is not yet functional
 
 Document:
 
-# \<field name\>: { type: GraphQLString },
+## \<field name\>: { type: GraphQLString },
 String type
 
-# \<field name\>: { type: GraphQLString, editable: true },
+## \<field name\>: { type: GraphQLString, editable: true },
 String that can be edited
 
-# \<field name\>: { type: GraphQLString, editable: true, uitype:"image" },
+## \<field name\>: { type: GraphQLString, editable: true, uitype:"image" },
 String field that stores the url of the image
 
-# d_key: { type: GraphQLString },
+## d_key: { type: GraphQLString },
 String field that is used to store the key auto-generate by forestore
 
-# \<field name\>: { type: GraphQLString, editable: true, uitype:"htmlContent" },
+## \<field name\>: { type: GraphQLString, editable: true, uitype:"htmlContent" },
 HTML string field that is used generate via tinyMCE
 
-# parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"catagory", meta:"self" }
+## parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"catagory", meta:"self" }
 Relation that refers to self.
 
-# \<other model\>_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"\<relation code\>" },
+## \<other model\>_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"\<relation code\>" },
 Relation that refers to other model
 
 

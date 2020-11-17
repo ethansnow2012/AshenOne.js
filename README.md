@@ -2,6 +2,7 @@
 :warning: ** This project is under construction. Feature lacks. Do not use in production unless you understand this project. **: Be very careful here!
 
 ## Demo
+Account: guest1@gmail.com Password: 123456
 [Demo Link](https://ashenonejs-demo.web.app/adminee/catagory)
 
 ## Commends

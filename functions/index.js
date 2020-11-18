@@ -746,6 +746,11 @@ app.get('/adminee/login', factory__express_handle(
 ))
 app.get('/jet/:schema_key', factory__express_handle(
     async function (req, res, context) {
+        
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+
         context['ssr_data']['schema_key'] = Object.keys(schema_manager.fullDelare)
         context['schema_key'] = req.params.schema_key || context['ssr_data']['schema_key'][ Object.keys(context['ssr_data']['schema_key'])[0] ]
         let data = context['ssr_data'][`${req.params.schema_key}_list`] = await schema_list[req.params.schema_key][`get_${req.params.schema_key}_list`]({}, {req, res, context})

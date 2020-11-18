@@ -222,7 +222,7 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                 },
                 resolve: async (parent, args) => {
                     let rtn = []
-                    var _collection = storedb.collection(sname+"_list");//.where('createBy_uid', '==', args.uid)
+                    var _collection = storedb.collection(sname+"_list").where("createTime", ">", new Date('2010-05-28 08:01:00'))
                     if(args.uid){
                         _collection = _collection.where("createBy_uid", "==", args.uid)
                     }else{
@@ -233,6 +233,8 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                             _collection = _collection.where(x, "==", args.where[x])
                         }
                     }
+                    _collection = _collection.orderBy("createTime", "asc")
+                    
                     const snapshot = await _collection.get();
                     snapshot.forEach((x) => {
                         let data = x.data()

@@ -75,6 +75,7 @@ Account: guest1@gmail.com Password: 123456
   - firebase target:apply hosting app <project name>
   - storage.rules(local)
   - 
+5. build composite id on createTime-xxxx for getting data with order required the index
 
 =======================
 

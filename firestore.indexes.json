@@ -1,4 +1,29 @@
 {
-  "indexes": [],
+  "indexes": [
+    { 
+      "collectionGroup": "phoneInfo_list",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createTime", "order": "ASCENDING" }
+      ]
+    },
+    { 
+      "collectionGroup": "catagory_list",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createTime", "order": "ASCENDING" }
+      ]
+    },
+    { 
+      "collectionGroup": "third_list",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createTime", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

@@ -744,7 +744,7 @@ app.get('/adminee/login', factory__express_handle(
         res.render('v6/pages/login', { csrfToken: csrfToken, context: context })
     }
 ))
-app.get('/jet/(:schema_key)?', factory__express_handle(
+app.get('/jet/:schema_key', factory__express_handle(
     async function (req, res, context) {
         context['ssr_data']['schema_key'] = Object.keys(schema_manager.fullDelare)
         context['schema_key'] = req.params.schema_key || context['ssr_data']['schema_key'][ Object.keys(context['ssr_data']['schema_key'])[0] ]

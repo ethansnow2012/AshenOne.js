@@ -14,6 +14,8 @@ Account: guest1@gmail.com Password: 123456
    - NODE_ENV=development firebase serve --only functions,hosting
 ## A web app template on firebase with fully declarative CMS.
 =======================
+firebase only allow cookie named "__session"
+=======================
 
 1.
   - copy local file

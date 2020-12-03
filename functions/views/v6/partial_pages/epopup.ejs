@@ -83,7 +83,7 @@
                 <div>
                     <button id="commit_edit_XXSSmodelnameSSXX"> Save </button>
                     <button class="e-popup-close"> Cancel </button>
-                    <button id="commit_delete_catagory_list" class="e-btn-danger"> Delete </button>
+                    <button id="commit_delete_XXSSmodelnameSSXX_list" class="e-btn-danger"> Delete </button>
                 </div>
             </div>
         </div>
@@ -100,15 +100,25 @@
 <template id="e_popup_firebackend_input_image">
     <div class="e-popup-content-i e-popup-content-icenter">
         <label for="">XXSSactionSSXX XXSSfieldnameSSXX</label>
-        <input type="file" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX" accept="image/png, image/jpeg">
+        <input type="file" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX" accept="image/png, image/jpeg, image/webp">
         <br>
         <img id="input_XXSSactionSSXX_XXSSmodelnameSSXX_imgbody" width="500" src="">
+    </div>    
+</template>
+<template id="e_popup_firebackend_input_pdf">
+    <div class="e-popup-content-i e-popup-content-icenter" style="">
+        <label for="">XXSSactionSSXX XXSSfieldnameSSXX</label>
+        <input type="file" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX" accept="application/pdf, application/vnd.ms-excel">
+        <br>
+        <iframe id="input_XXSSactionSSXX_XXSSmodelnameSSXX_pdfbody" src="" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+        <!-- <embed  src="" type="application/pdf"  name="pdf"/> -->
+        <!-- <img  width="500" src=""> -->
     </div>    
 </template>
 <template id="e_popup_firebackend_input_relaiton">
     <div class="e-popup-content-i e-popup-content-icenter">
         <select id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSrelationSSXX_XXSSfieldnameSSXX" class="firebackend_relation_select">
-            <option value="-1">請選擇主頻道</option>
+            <option value="-1">選擇父關聯</option>
         </select>
     </div>
 </template>
@@ -118,6 +128,9 @@
         <textarea type="text" class="tedit firebackend_tedit" id="input_XXSSactionSSXX_XXSSmodelnameSSXX_XXSSfieldnameSSXX_XXSSidkeySSXX" rows="4" cols="50"></textarea>
     </div>
 </template>
+<style>
+    [name$='pdf'] { width:100%; height: auto;}
+</style>
 
 <script>
     // e-popup utils
@@ -138,12 +151,15 @@
 
         this.add_file = null
         this.edit_file = null
+        this.add_file_pdf = null
+        this.edit_file_pdf = null
 
         let string_html_model_encap = document.querySelector("#e_popup_firebackend_model_encap").content.firstElementChild.outerHTML
         let string_html_add = document.querySelector("#e_popup_firebackend_add").content.firstElementChild.outerHTML
         let string_html_edit = document.querySelector("#e_popup_firebackend_edit").content.firstElementChild.outerHTML
         let string_html_input_string = document.querySelector("#e_popup_firebackend_input_string").content.firstElementChild.outerHTML
         let string_html_input_image = document.querySelector("#e_popup_firebackend_input_image").content.firstElementChild.outerHTML
+        let string_html_input_pdf = document.querySelector("#e_popup_firebackend_input_pdf").content.firstElementChild.outerHTML
         let string_html_input_relaiton = document.querySelector("#e_popup_firebackend_input_relaiton").content.firstElementChild.outerHTML
         let string_html_input_tedit = document.querySelector("#e_popup_firebackend_input_tedit").content.firstElementChild.outerHTML
 
@@ -172,7 +188,13 @@
                                                 .replaceAll(action_alter,'add')
                                                 .replaceAll(fieldname_alter,_key)
                     inputField = this.createElementHTMLFromStr(inputField)
-                }else if(_schema.type == "relation"){ 
+                }else if(_schema.type == "pdf"){ 
+                    inputField = string_html_input_pdf
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'add')
+                                                .replaceAll(fieldname_alter,_key)
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }else if(_schema.type == "relation" && this.relation_list){ 
                     inputField = string_html_input_relaiton
                                                 .replaceAll(model_name_alter,this.model_name)
                                                 .replaceAll(action_alter,'add')
@@ -181,7 +203,7 @@
                     inputField = this.createElementHTMLFromStr(inputField)
                     for(x in this.relation_list){
                         let _relation = this.relation_list[x]
-                        inputField.querySelector("select").appendChild(this.createElementHTMLFromStr(`<option value="${_relation.code}">${_relation.name}</option>`))
+                        inputField.querySelector("select").appendChild(this.createElementHTMLFromStr(`<option value="${_relation.code}">${_relation.name||_relation.title||_relation.code}</option>`))
                     }
                                                 
                 }else if(_schema.type == "tedit"){ 
@@ -210,7 +232,13 @@
                                                 .replaceAll(action_alter,'edit')
                                                 .replaceAll(fieldname_alter,_key)
                     inputField = this.createElementHTMLFromStr(inputField)
-                }else if(_schema.type == "relation"){ 
+                }else if(_schema.type == "pdf"){ 
+                    inputField = string_html_input_pdf
+                                                .replaceAll(model_name_alter,this.model_name)
+                                                .replaceAll(action_alter,'edit')
+                                                .replaceAll(fieldname_alter,_key)
+                    inputField = this.createElementHTMLFromStr(inputField)
+                }else if(_schema.type == "relation" && this.relation_list){ 
                     inputField = string_html_input_relaiton
                                                 .replaceAll(model_name_alter,this.model_name)
                                                 .replaceAll(action_alter,'edit')
@@ -219,7 +247,7 @@
                     inputField = this.createElementHTMLFromStr(inputField)                                                
                     for(x in this.relation_list){
                         let _relation = this.relation_list[x]
-                        inputField.querySelector("select").appendChild(this.createElementHTMLFromStr(`<option value="${_relation.code}">${_relation.name}</option>`))
+                        inputField.querySelector("select").appendChild(this.createElementHTMLFromStr(`<option value="${_relation.code}">${_relation.name||_relation.title||_relation.code}</option>`))
                     }                                                
                     
                 }else if(_schema.type == "tedit"){ 
@@ -240,7 +268,7 @@
         document.querySelector(".e-popup-rootwrapper").appendChild(html_model_encap)
         this.loadScript()
     }
-    _e_popup_firebackend.prototype.getDataObjFromUI = function(rootqstr,action,downloadURL) {
+    _e_popup_firebackend.prototype.getDataObjFromUI = function(rootqstr,action,downloadURL,downloadURL_pdf) {
         let _data = {}
         for(_key in this.interface_schema){
             let schema = this.interface_schema[_key]
@@ -257,83 +285,63 @@
                 _data[_key] = tinyMCE.get(tedit_id).getContent()
             }
         }
-        _data["img"] = downloadURL
+        if(_data["img"]||downloadURL){
+            _data["img"] = downloadURL
+        }
+        if(_data["pdf"]||downloadURL_pdf){
+            _data["pdf"] = downloadURL_pdf
+        }
+        //_data["pdf"] = downloadURL_pdf
         return _data
     }
     _e_popup_firebackend.prototype.loadScript = function() {
-        document.querySelector(`#input_add_${this.model_name}_img`).addEventListener("change",(evt)=>{
-            let _file = evt.target.files[0]
-            _file.name = Date.now()+"_"+_file.name
-            this.add_file = _file
-        })
-        document.querySelector(`#input_edit_${this.model_name}_img`).addEventListener("change",(evt)=>{
-            let _file = evt.target.files[0]
-            _file.name = Date.now()+"_"+_file.name
-            this.edit_file = _file
-            document.querySelector(`#input_edit_${this.model_name}_imgbody`).src = ""
-        })
+        let _el_img = document.querySelector(`#input_add_${this.model_name}_img`)
+        let _el_img_edit = document.querySelector(`#input_edit_${this.model_name}_img`)
+        let _el_pdf = document.querySelector(`#input_add_${this.model_name}_pdf`)
+        let _el_pdf_edit = document.querySelector(`#input_edit_${this.model_name}_pdf`)
+
+        if(_el_img){
+            _el_img.addEventListener("change",(evt)=>{
+                let _file = evt.target.files[0]
+                _file.name = Date.now()+"_"+_file.name
+                this.add_file = _file
+            })
+        }
+        if(_el_img_edit){
+            _el_img_edit.addEventListener("change",(evt)=>{
+                let _file = evt.target.files[0]
+                _file.name = Date.now()+"_"+_file.name
+                this.edit_file = _file
+                document.querySelector(`#input_edit_${this.model_name}_imgbody`).src = ""
+            })
+        }
+        if(_el_pdf){
+            _el_pdf.addEventListener("change",(evt)=>{
+                let _file = evt.target.files[0]
+                _file.name = Date.now()+"_"+_file.name
+                this.add_file_pdf = _file
+            })
+        }
+        if(_el_pdf_edit){
+            _el_pdf_edit.addEventListener("change",(evt)=>{
+                let _file = evt.target.files[0]
+                _file.name = Date.now()+"_"+_file.name
+                this.edit_file_pdf = _file
+                document.querySelector(`#input_edit_${this.model_name}_pdfbody`).src = ""
+            })
+        }
+        
         
         document.querySelector(`#commit_new_${this.model_name}`).addEventListener("click", async (el) => {
             var rootqstr = `.e-popup-add_${this.model_name} `
             loadingSVG.on(`#commit_new_${this.model_name}`)
             
-            var success_afdfda = (downloadURL)=>{
+            var success_add = (downloadURL, downloadURL_pdf)=>{
                 
-                //_data["img"] = downloadURL
                 fetch_post(`/add_${this.model_name}`,
                 {
                     _csrf: csrfToken,
-                    data: this.getDataObjFromUI(rootqstr,"add",downloadURL)
-                })
-                .then((response) => {
-                    loadingSVG.off()
-                    return response.json();
-                }).then((jsonData) => {
-                    //e_popup1.close(`.e-popup-add_${this.model_name}`)
-                    if(jsonData=="authDenied"){
-                        alert("authDenied")
-                        throw "authDenied"
-                    }
-                    this.close()
-                    location.reload()
-                }).catch((err) => {
-                    alert(err)
-                    console.log('錯誤:', err);
-                });
-            }
-            if(!this.add_file){
-                success_afdfda("")
-                return
-            }
-            let storageRef = firebase.storage().ref('uploads/'+this.add_file.name)
-            let task = storageRef.put(this.add_file)
-            let snapshot_holder = null
-            task.on("state_changed",
-                function progress(snapshot) {
-                    snapshot_holder = snapshot
-                    console.log("progress")
-                },
-                function error(err) {
-                    console.log("err")
-                    failure('failed')
-                },
-                function complete(x) {
-                    console.log("complete")
-                    snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
-                        success_afdfda(downloadURL)
-                    });
-                }
-            )
-        })
-        document.querySelector(`#commit_edit_${this.model_name}`).addEventListener("click", async (el) => {
-            var rootqstr = `.e-popup-edit_${this.model_name} `
-            loadingSVG.on(`#commit_edit_${this.model_name}`)
-            var success_fdsgh = (downloadURL) => { //downloadURL must provide
-                fetch_post(`/update_${this.model_name}`,
-                {
-                    _csrf: csrfToken,
-                    d_key: due_data_sdadkjj.d_key,
-                    data:this.getDataObjFromUI(rootqstr,"edit",downloadURL)
+                    data: this.getDataObjFromUI(rootqstr,"add",downloadURL,downloadURL_pdf)
                 })
                 .then((response) => {
                     loadingSVG.off()
@@ -352,30 +360,166 @@
                 });
             }
 
-            if(!this.edit_file){
-                success_fdsgh(due_data_sdadkjj.img)
-                return
-            }
-            let storageRef = firebase.storage().ref('uploads/'+this.edit_file.name)
-            let task = storageRef.put(this.edit_file)
-            let snapshot_holder = null
-            task.on("state_changed",
-                function progress(snapshot) {
-                    snapshot_holder = snapshot
-                    console.log("progress")
-                },
-                function error(err) {
-                    console.log("err")
-                    failure('failed')
-                },
-                function complete(x) {
-                    console.log("complete")
-                    snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
-                        success_fdsgh(downloadURL)
-                    });
-                    
+            let uploading_img = new Promise( (resolve, reject) =>{
+                if(!this.add_file){
+                    resolve("")
                 }
-            )
+                let storageRef = firebase.storage().ref('uploads/'+this.add_file.name)
+                let task = storageRef.put(this.add_file)
+                let snapshot_holder = null
+                task.on("state_changed",
+                    function progress(snapshot) {
+                        snapshot_holder = snapshot
+                        console.log("progress img")
+                    },
+                    function error(err) {
+                        console.log("err")
+                        failure('failed img')
+                    },
+                    function complete(x) {
+                        console.log("complete img")
+                        snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                            resolve(downloadURL)//success_add(downloadURL,downloadURL_pdf)
+                        });
+                    }
+                )
+            })
+            let uploading_pdf = new Promise( (resolve, reject) =>{
+                if(!this.add_file_pdf){
+                    resolve("")
+                }
+                let storageRef = firebase.storage().ref('uploads/'+this.add_file_pdf.name)
+                let task = storageRef.put(this.add_file_pdf)
+                let snapshot_holder = null
+                task.on("state_changed",
+                    function progress(snapshot) {
+                        snapshot_holder = snapshot
+                        console.log("progress pdf")
+                    },
+                    function error(err) {
+                        console.log("err")
+                        failure('failed pdf')
+                    },
+                    function complete(x) {
+                        console.log("complete pdf")
+                        //resolve(downloadURL)
+                        snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                            resolve(downloadURL)
+                            //success_add(downloadURL,downloadURL_pdf)
+                        });
+                    }
+                )
+            })
+            Promise.all([uploading_img,uploading_pdf]).then((x)=>{
+                success_add(...x)
+            })
+        })
+        document.querySelector(`#commit_edit_${this.model_name}`).addEventListener("click", async (el) => {
+            var rootqstr = `.e-popup-edit_${this.model_name} `
+            loadingSVG.on(`#commit_edit_${this.model_name}`)
+            var success_edit = (downloadURL,downloadURL_pdf) => { //downloadURL must provide
+                fetch_post(`/update_${this.model_name}`,
+                {
+                    _csrf: csrfToken,
+                    d_key: due_data_sdadkjj.d_key,
+                    data:this.getDataObjFromUI(rootqstr,"edit",downloadURL,downloadURL_pdf)
+                })
+                .then((response) => {
+                    loadingSVG.off()
+                    return response.json();
+                }).then((jsonData) => {
+                    //e_popup1.close(`.e-popup-add_${this.model_name}`)
+                    if(jsonData=="authDenied"){
+                        alert("authDenied")
+                        throw "authDenied"
+                    }
+                    this.close()
+                    location.reload()
+                }).catch((err) => {
+                    alert(err)
+                    console.log('錯誤:', err);
+                });
+            }
+            
+            let uploading_img = new Promise( (resolve, reject) =>{
+                if(!this.edit_file){
+                    resolve("")
+                }
+                let storageRef = firebase.storage().ref('uploads/'+this.edit_file.name)
+                let task = storageRef.put(this.edit_file)
+                let snapshot_holder = null
+                task.on("state_changed",
+                    function progress(snapshot) {
+                        snapshot_holder = snapshot
+                        console.log("progress img")
+                    },
+                    function error(err) {
+                        console.log("err")
+                        failure('failed img')
+                    },
+                    function complete(x) {
+                        console.log("complete img")
+                        snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                            resolve(downloadURL)//success_add(downloadURL,downloadURL_pdf)
+                        });
+                    }
+                )
+            })
+            let uploading_pdf = new Promise( (resolve, reject) =>{
+                if(!this.edit_file_pdf){
+                    resolve("")
+                }
+                let storageRef = firebase.storage().ref('uploads/'+this.edit_file_pdf.name)
+                let task = storageRef.put(this.edit_file_pdf)
+                let snapshot_holder = null
+                task.on("state_changed",
+                    function progress(snapshot) {
+                        snapshot_holder = snapshot
+                        console.log("progress pdf")
+                    },
+                    function error(err) {
+                        console.log("err")
+                        failure('failed pdf')
+                    },
+                    function complete(x) {
+                        console.log("complete pdf")
+                        //resolve(downloadURL)
+                        snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+                            resolve(downloadURL)
+                            //success_add(downloadURL,downloadURL_pdf)
+                        });
+                    }
+                )
+            })
+            Promise.all([uploading_img,uploading_pdf]).then((x)=>{
+                success_edit(...x)
+            })
+
+
+            // if(!this.edit_file){
+            //     success_edit(due_data_sdadkjj.img, due_data_sdadkjj.pdf)
+            //     return
+            // }
+            // let storageRef = firebase.storage().ref('uploads/'+this.edit_file.name)
+            // let task = storageRef.put(this.edit_file)
+            // let snapshot_holder = null
+            // task.on("state_changed",
+            //     function progress(snapshot) {
+            //         snapshot_holder = snapshot
+            //         console.log("progress")
+            //     },
+            //     function error(err) {
+            //         console.log("err")
+            //         failure('failed')
+            //     },
+            //     function complete(x) {
+            //         console.log("complete")
+            //         snapshot_holder.ref.getDownloadURL().then(function (downloadURL) {
+            //             success_edit(downloadURL)
+            //         });
+                    
+            //     }
+            // )
         })
         
         if(document.querySelector(`.btn_add_${this.model_name}`)){
@@ -418,7 +562,14 @@
                         }
                     }
                     //document.querySelector(`#input_edit_${this.model_name}_name`).value = due_data_sdadkjj['name']
-                    document.querySelector(`#input_edit_${this.model_name}_imgbody`).src = due_data_sdadkjj['img']
+                    let _imgbody = document.querySelector(`#input_edit_${this.model_name}_imgbody`)
+                    if(_imgbody){
+                        _imgbody.src = due_data_sdadkjj['img'] || ""
+                    }
+                    let _pdfbody = document.querySelector(`#input_edit_${this.model_name}_pdfbody`)
+                    if(_pdfbody){
+                        _pdfbody.src = due_data_sdadkjj['pdf'] || ""
+                    }
                     this.open(`.e-popup-edit_${this.model_name}`)
                 })
             })
@@ -490,10 +641,9 @@
     <% context['ssr_data']['schema_key'].forEach((key)=>{ %>
         <%
             let selt_uischema_obj = Object.values(context['ssr_data'][`${key}_uischema`])
-            let relation_code = selt_uischema_obj
-                .filter((x) => {return (typeof x.relation_code == "string" )  })[0].relation_code// && x.meta != "self"
-            console.log(relation_code[0].relation_code)    
-            console.log("ssssssssss")
+            selt_uischema_obj = selt_uischema_obj
+                .filter((x) => {return (typeof x.relation_code == "string" )  })[0]
+            let relation_code = selt_uischema_obj?selt_uischema_obj.relation_code:""// && x.meta != "self"
         %>
         new _e_popup_firebackend("<%= key%>"
             ,<%- JSON.stringify(context.ssr_data[`${key}_uischema`]) %> 

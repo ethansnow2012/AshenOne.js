@@ -44,23 +44,59 @@
 <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-storage.js"></script>
 <script>
     const firebaseConfig = {
-        apiKey: "--",
-        authDomain: "--",
-        databaseURL: "--",
-        projectId: "--",
-        storageBucket: "--",
-        messagingSenderId: "--",
-        appId: "--",
-        measurementId: "--"
+        apiKey: "AIzaSyD2injhhy-dPqD1-FpmrILfYGLwjOp7gqA",
+        authDomain: "hc-ec-4710d.firebaseapp.com",
+        databaseURL: "https://hc-ec-4710d.firebaseio.com",
+        projectId: "hc-ec-4710d",
+        storageBucket: "hc-ec-4710d.appspot.com",
+        messagingSenderId: "780589573152",
+        appId: "1:780589573152:web:00133836c2750bd9568845",
+        measurementId: "G-LJ3F78HNR6"
     };
     firebase.initializeApp(firebaseConfig);
 </script>
 <script>
     const csrfToken = "<%= csrfToken %>" //getCookie('csrfToken')
-    function getCookie(name) {
+    function getCookie_raw(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
+	}
+	function getCookie(name){
+		let pre_cookie = getCookie_raw("__session")
+        let cookieObj = pre_cookie.split(`|ddsdd|`)
+            .map((x,ii)=>{
+                if(ii==0){ return {"__session":x} }
+                let aa = x.split(":")
+                let rtn = {}
+                rtn[aa[0]] = aa[1]
+                return rtn
+            }).filter((x)=>{
+                return x[Object.keys(x)[0]]
+            }).reduce((acc, x)=>{ let index=Object.keys(x)[0] ;acc[index] = x[index] ;return acc },{})
+		return cookieObj[name]
+	} 
+    function setCookie(name,value) {
+        let pre_cookie = getCookie_raw("__session")
+        let cookieObj = pre_cookie.split(`|ddsdd|`)
+            .map((x,ii)=>{
+                if(ii==0){ return {"__session":x} }
+                let aa = x.split(":")
+                let rtn = {}
+                rtn[aa[0]] = aa[1]
+                return rtn
+            }).filter((x)=>{
+                return x[Object.keys(x)[0]]
+            }).reduce((acc, x)=>{ let index=Object.keys(x)[0] ;acc[index] = x[index] ;return acc },{})
+        
+        if(cookieObj[name]){
+            let regex_txt=`\\|ddsdd\\|${name}:(.)+\\|ddsdd\\|`
+            let regex = new RegExp(regex_txt);
+            pre_cookie = pre_cookie.replace(regex,`|ddsdd|${name}:${value}|ddsdd|`)
+            //pre_cookie = pre_cookie.replace(/\|ddsdd\|aaa:.+\|ddsdd\|/,`|ddsdd|aaa:ccc|ddsdd|`)
+        }
+        //add
+        document.cookie = "__session" + "=" + (pre_cookie || "")+"|ddsdd|" +name+":"+value +"|ddsdd|"+ "; path=/";
     }
     function fetch_post(url, obj) {
         return fetch(url, {

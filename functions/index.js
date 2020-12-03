@@ -25,8 +25,10 @@ function obj2literal(obj) // this works with graphql string concatenation
     var str = JSON.stringify(obj, 0, 4),
         arr = str.match(/".*?":/g);
 
-    for(var i = 0; i < arr.length; i++)
+    for(var i = 0; i < arr.length; i++){
         str = str.replace(arr[i], arr[i].replace(/"/g,''));
+    }
+        
 
     return str;
 }
@@ -63,79 +65,118 @@ const UserMetaType_archFields = {
 
 
 let fullDelare = {
-    third:{
-        model_name: "third",
+    product_catagory:{
+        model_name: "product_catagory",
         uimenu:true,
         schema: () => ({
-            name: { type: GraphQLString, editable: true },
-            code: { type: GraphQLString },
-            parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"third", meta:"self" },
-            status: { type: GraphQLString },
-            createTime: { type: GraphQLString },
-            createBy_uid: { type: GraphQLString },
-            img:{ type: GraphQLString, editable: true, uitype:"image" },
-            d_key: { type: GraphQLString },
-            
-        })
-    },
-    catagory:{
-        model_name: "catagory",
-        uimenu:true,
-        schema: () => ({
-            name: { type: GraphQLString, editable: true },
-            code: { type: GraphQLString },
-            parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"catagory", meta:"self" },
-            status: { type: GraphQLString },
-            createTime: { type: GraphQLString },
-            createBy_uid: { type: GraphQLString },
-            img:{ type: GraphQLString, editable: true, uitype:"image" },
-            d_key: { type: GraphQLString },
-            phoneInfo:{
-                type: GraphQLList(schema_manager.tHolder["phoneInfo"]), // mutually dependent
-                resolve: async (parent, args) => {  //wrong
-                    
-                    let rtn = []
-                    var _collection = storedb.collection("phoneInfo_list");//.where('createBy_uid', '==', args.uid)
-                    
-                    if(false){    
-                        _collection = _collection.where("createBy_uid", "==", args.uid)
-                    }else{
-                        _collection = _collection.where("status", "==", "onWeb")
-                    }
-                    
-                    const snapshot = await _collection.get();
-                    snapshot.forEach((x) => {
-                        let data = x.data()
-                        data['d_key'] = x.id //!!                           
-                        rtn.push(data)
-                    })
-                    rtn = rtn.filter((x) => x.status == define_status.onWeb)
-                    rtn = rtn.sort((a,b)=> a.createTime._seconds < b.createTime._seconds)
-                    return rtn
-                }
-            }
-        })
-    },
-    phoneInfo:{
-        model_name: "phoneInfo",
-        uimenu:true,
-        schema: () => ({
-            modelText1: { type: GraphQLString, editable: true },
-            catagory_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"catagory" },
-            modelText2: { type: GraphQLString, editable: true },
-            modelText2_price: { type: GraphQLString, editable: true },
-            price1: { type: GraphQLString, editable: true},
-            price2: { type: GraphQLString, editable: true},
-            price3: { type: GraphQLString, editable: true},
-            price4: { type: GraphQLString, editable: true},
-            img: { type: GraphQLString, editable: true, uitype:"image" },
+            title: { type: GraphQLString, editable: true },
+            code: { type: GraphQLString, editable: true },
+            parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"product_catagory", meta:"self" },
+            subTitle: { type: GraphQLString, editable: true },
+            brief: { type: GraphQLString, editable: true, uitype:"htmlContent" },
             content: { type: GraphQLString, editable: true, uitype:"htmlContent" },
-            status: { type: GraphQLString },//GraphQLNonNull is not working now
+            img:{ type: GraphQLString, editable: true, uitype:"image" },
+            status: { type: GraphQLString },
             createTime: { type: GraphQLString },
             createBy_uid: { type: GraphQLString },
-            d_key: { type: GraphQLString }
+            d_key: { type: GraphQLString },
+            lang: { type: GraphQLString}
         })
-    }
+    },
+    product:{
+        model_name: "product",
+        uimenu:true,
+        schema: () => ({
+            title: { type: GraphQLString, editable: true },
+            subTitle: { type: GraphQLString, editable: true },
+            product_catagory_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"product_catagory" },
+            code: { type: GraphQLString},
+            brief: { type: GraphQLString, editable: true, uitype:"htmlContent" },
+            content: { type: GraphQLString, editable: true, uitype:"htmlContent" },
+            img:{ type: GraphQLString, editable: true, uitype:"image" },
+            pdf:{ type: GraphQLString, editable: true, uitype:"pdf" },
+            status: { type: GraphQLString },
+            createTime: { type: GraphQLString },
+            createBy_uid: { type: GraphQLString },
+            img:{ type: GraphQLString, editable: true, uitype:"image" },
+            d_key: { type: GraphQLString },
+            lang: { type: GraphQLString}
+        })
+    },
+    // third:{
+    //     model_name: "third",
+    //     uimenu:true,
+    //     schema: () => ({
+    //         name: { type: GraphQLString, editable: true },
+    //         code: { type: GraphQLString },
+    //         parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"third", meta:"self" },
+    //         status: { type: GraphQLString },
+    //         createTime: { type: GraphQLString },
+    //         createBy_uid: { type: GraphQLString },
+    //         img:{ type: GraphQLString, editable: true, uitype:"image" },
+    //         d_key: { type: GraphQLString },
+            
+    //     })
+    // },
+    // catagory:{
+    //     model_name: "catagory",
+    //     uimenu:true,
+    //     schema: () => ({
+    //         name: { type: GraphQLString, editable: true },
+    //         code: { type: GraphQLString },
+    //         parent_code: { type: GraphQLString, editable: true, uitype:"relation", relation_code:"catagory", meta:"self" },
+    //         status: { type: GraphQLString },
+    //         createTime: { type: GraphQLString },
+    //         createBy_uid: { type: GraphQLString },
+    //         img:{ type: GraphQLString, editable: true, uitype:"image" },
+    //         pdf:{ type: GraphQLString, editable: true, uitype:"pdf" },
+    //         d_key: { type: GraphQLString },
+    //         phoneInfo:{
+    //             type: GraphQLList(schema_manager.tHolder["phoneInfo"]), // mutually dependent
+    //             resolve: async (parent, args) => {  //wrong
+                    
+    //                 let rtn = []
+    //                 var _collection = storedb.collection("phoneInfo_list");//.where('createBy_uid', '==', args.uid)
+                    
+    //                 if(false){    
+    //                     _collection = _collection.where("createBy_uid", "==", args.uid)
+    //                 }else{
+    //                     _collection = _collection.where("status", "==", "onWeb")
+    //                 }
+                    
+    //                 const snapshot = await _collection.get();
+    //                 snapshot.forEach((x) => {
+    //                     let data = x.data()
+    //                     data['d_key'] = x.id //!!                           
+    //                     rtn.push(data)
+    //                 })
+    //                 rtn = rtn.filter((x) => x.status == define_status.onWeb)
+    //                 rtn = rtn.sort((a,b)=> a.createTime._seconds < b.createTime._seconds)
+    //                 return rtn
+    //             }
+    //         }
+    //     })
+    // },
+    // phoneInfo:{
+    //     model_name: "phoneInfo",
+    //     uimenu:true,
+    //     schema: () => ({
+    //         modelText1: { type: GraphQLString, editable: true },
+    //         catagory_code: { type: GraphQLString, editable: true, uitype:"relation",relation_code:"catagory" },
+    //         modelText2: { type: GraphQLString, editable: true },
+    //         modelText2_price: { type: GraphQLString, editable: true },
+    //         price1: { type: GraphQLString, editable: true},
+    //         price2: { type: GraphQLString, editable: true},
+    //         price3: { type: GraphQLString, editable: true},
+    //         price4: { type: GraphQLString, editable: true},
+    //         img: { type: GraphQLString, editable: true, uitype:"image" },
+    //         content: { type: GraphQLString, editable: true, uitype:"htmlContent" },
+    //         status: { type: GraphQLString },//GraphQLNonNull is not working now
+    //         createTime: { type: GraphQLString },
+    //         createBy_uid: { type: GraphQLString },
+    //         d_key: { type: GraphQLString }
+    //     })
+    // }
 }
 
 let get_archFields_keyString = (fn_XXX_archFields, fullDeclare, mode=2)=>{
@@ -147,7 +188,7 @@ let get_archFields_keyString = (fn_XXX_archFields, fullDeclare, mode=2)=>{
                 continue;
             }
             tempStr1 = `${x} {
-                ${get_archFields_keyString(fullDeclare[x].schema, fullDeclare, 1)} // "1" for recursive-exit
+                ${get_archFields_keyString(fullDeclare[x].schema, fullDeclare, 1)} 
             }`
         }else{
             tempStr1 = x
@@ -162,10 +203,14 @@ let get_archFields_keyString_withData = (obj_archFields, data, context) => {
     let uid_server_side = context.uid_server_side || ""
     let user_privilege = context.user_privilege || 1
     for(x in data){
-        if( _temp_obj[x] || _temp_obj[x].hasOwnProperty("resolve")){
+        if( _temp_obj[x] && _temp_obj[x].hasOwnProperty("resolve")){
             delete _temp_obj[x]
         }
-        _str += `${x}:"${data[x]}", `
+        let _value = data[x]
+        if(obj_archFields[x]['uitype'] == 'htmlContent'){
+            _value = encodeURIComponent(_value)
+        }
+        _str += `${x}:"${_value}", `
     }
     _str += `createBy_uid: "${uid_server_side}"`
     _str += `user_privilege: "${user_privilege}"`
@@ -221,6 +266,7 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                     where: { type: GraphQLJSONObject }
                 },
                 resolve: async (parent, args) => {
+                    let _schema = fullDelare[sname].schema()
                     let rtn = []
                     var _collection = storedb.collection(sname+"_list").where("createTime", ">", new Date('2010-05-28 08:01:00'))
                     if(args.uid){
@@ -233,11 +279,26 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                             _collection = _collection.where(x, "==", args.where[x])
                         }
                     }
+                    
+
                     _collection = _collection.orderBy("createTime", "asc")
                     
                     const snapshot = await _collection.get();
                     snapshot.forEach((x) => {
+                        
                         let data = x.data()
+                        Object.keys(data).forEach((field)=>{
+                            
+                            if(_schema[field] && _schema[field].uitype == "htmlContent"){
+                                
+                                try{
+                                    data[field] = decodeURIComponent(data[field]) 
+                                }catch(e){
+
+                                }
+                            }
+                        })
+                        
                         data['d_key'] = x.id //!!                           
                         rtn.push(data)
                     })
@@ -253,6 +314,7 @@ _schema_manager.prototype.schema_factory = function(delare_name){
             let _archFields = slf.schema()
             _archFields['user_privilege'] = { type: GraphQLString }
             _archFields['uid'] = { type: GraphQLString }
+            _archFields['lang'] = { type: GraphQLString }
             _archFields['d_key'] = { type: GraphQLString }
             _archFields['createBy_uid'] = { type: GraphQLString }
             _archFields['update'] = { type: GraphQLJSONObject }
@@ -273,6 +335,7 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                         return false
                     }
                     args.code = backend_utils.uniqueID()
+                    args.code = args.code.toString()
                     args.createTime = admin.firestore.Timestamp.now()
                     
                     const dataset = args
@@ -286,6 +349,7 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                 args: _archFields,
                 resolve: async (parent, args) => {
                     if( args.update ){
+                        let _schema = fullDelare[sname].schema()
                         // mutation pre-check
                         let check_docRef = storedb.collection(sname+'_list').doc(args.d_key);
                         let check_rtn = await check_docRef.get()
@@ -297,7 +361,9 @@ _schema_manager.prototype.schema_factory = function(delare_name){
                         let docRef = storedb.collection(sname+'_list').doc(args.d_key);
                         var rtn = await docRef.update(args.update)
                         if(rtn._writeTime){
-                            return {name:"null"} // still need to return something
+                            rtn = {}
+                            rtn[Object.keys(_schema)[0]] = "null"
+                            return rtn // still need to return something
                         }
                         return rtn
                         
@@ -308,11 +374,25 @@ _schema_manager.prototype.schema_factory = function(delare_name){
             return _fieldObj
         },
     }
-    rtn[`get_${sname}_list`] = async function ({}, {req, res, context}) {
+    rtn[`get_${sname}_list`] = async function ({where}, {req, res, context}) {
+        let lang = context.lang || 'tw'
+        let whereStr = ""
+        if(!where){where={}}
+        where.lang = lang
+        if(where){
+            for(x in where){
+                if(!where[x]){
+                    delete where[x]
+                }
+            }
+            whereStr = `(where: ${obj2literal(where)})`//.replace(/({|})/g,"")
+        }
+        //whereStr = ""
         return graphql.graphql(schema, `
         {
-            ${sname}_list{
+            ${sname}_list${ whereStr? whereStr:""}{
                 ${get_archFields_keyString(slf.schema, fullDelare)}
+                
             }
         }
         `).then((x) => {
@@ -325,11 +405,13 @@ _schema_manager.prototype.schema_factory = function(delare_name){
     }
     rtn[`add_${sname}`] = async function (req, res, context) {
         // "get_archFields_keyString_withData" handle the "editable behavior" 
+        let lang = context.lang
         let archFields = slf.schema()
         return graphql.graphql(schema, `
         mutation{
             add_${sname}(
                 ${get_archFields_keyString_withData(archFields, req.body.data, context)}
+                ,lang:"${lang}" 
             ){
                 ${Object.keys(archFields)[0]}
             }
@@ -492,6 +574,8 @@ var schema_list = {
                         rtn[x] = { type:"relation", relation_code:schema[x].relation_code }
                     }else if(schema[x].uitype == "image"){
                         rtn[x] = { type:"image" }
+                    }else if(schema[x].uitype == "pdf"){
+                        rtn[x] = { type:"pdf" }
                     }else if(schema[x].type.name == "String"){
                         rtn[x] = { type:"string" }
                     } 
@@ -559,6 +643,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(cookieParser(['array', 'of', 'secrets']));
+
 // on future requests, the UID can be found using `req.cookies['__session'].uid`
 
 var csrfProtection = null
@@ -582,18 +667,31 @@ var factory__express_handle = function (fn) {
     
     return async function (req, res) {
         var sessionCookie = req.cookies.__session || '';
+        sessionCookie = sessionCookie.split(`|ddsdd|`)
+            .map((x,ii)=>{
+                if(ii==0){ return {"__session":x} }
+                let aa = x.split(":")
+                let rtn = {}
+                rtn[aa[0]] = aa[1]
+                return rtn
+            }).filter((x)=>{
+                return x[Object.keys(x)[0]]
+            }).reduce((acc, x)=>{ let index=Object.keys(x)[0] ;acc[index] = x[index] ;return acc },{})
         var context = {}
+        
+        context.lang = sessionCookie.lang || 'tw'
+
         context.ssr_data = {}
         context.uid_server_side = ""
         context.user_privilege = ""
-        admin.auth().verifySessionCookie(sessionCookie, true /** checkRevoked */)
+        admin.auth().verifySessionCookie(sessionCookie['__session']|| "", true /** checkRevoked */)
             .then((decodedClaims) => {
                 context.logedin = true
                 
                 if (decodedClaims.user_id) {
                     context.uid_server_side = decodedClaims.user_id
                 }
-                if(decodedClaims.email=="ashenone@gmail.com"){
+                if(decodedClaims.email=="hcec_admin@gmail.com"){
                     context.user_privilege = 5
                 }
                 
@@ -644,6 +742,23 @@ app.post('/sessionLogin', (req, res) => {
             res.status(401).send('UNAUTHORIZED REQUEST!');
         });
 });
+app.post(`/post_contact_info`, factory__express_handle(
+    async function (req, res, context) {
+
+        
+        
+        const docRef = storedb.collection('aaa_contact_list').doc();
+        const rtn = await docRef.set(req.body.data)
+
+        
+
+
+        
+
+        res.json(rtn)
+        res.end()
+    }
+))
 
 //fullDelare
 Object.keys(schema_manager.fullDelare).forEach((key)=>{
@@ -684,37 +799,181 @@ Object.keys(schema_manager.fullDelare).forEach((key)=>{
     ))
 })
 
-
-
+// frontend meta
+const s_text = {
+    menu_txt1:{
+        tw:"Home",
+        en:"Home"
+    },
+    menu_txt2:{
+        tw:"關於弘誠",
+        en:"About"
+    },
+    menu_txt3:{
+        tw:"產品介紹",
+        en:"Product"
+    },
+    menu_txt4:{
+        tw:"聯絡弘誠",
+        en:"Contact"
+    },
+}
 // ==============end==================
+app.get('/test/test',async function (req, res, context) {
+    res.send("test")
+})
 app.get('/blank', async function (req, res, context) {
         res.send('hello world');
     }
 )
-app.get('/', factory__express_handle(
-    async function (req, res, context) {//11
-        // let catagory_list = await schema_list.catagory.get_catagory_list({}, {req, res, context})
-        // let phoneInfo_list = await schema_list.phoneInfo.get_phoneInfo_list({}, {req, res, context})
-        // context['ssr_data']['catagory_uischema'] = schema_list.fn.schema2uischema(schema_manager.fullDelare.catagory.schema())
-        // context['ssr_data']['catagory_uiphoneInfo'] = schema_list.fn.schema2uischema(schema_manager.fullDelare.phoneInfo.schema())
-        // context['ssr_data']['catagory_list'] = catagory_list
-        // context['ssr_data']['phoneInfo_list'] = phoneInfo_list
-        // context['ssr_data']['posts'] = {}
-        // let csrfToken = req.csrfToken?req.csrfToken():""
-        // res.render('v6/index', { csrfToken: csrfToken, context: context })
-        
-        //context['schema_key'] = req.params.schema_key
 
-        context['ssr_data']['schema_key'] = Object.keys(schema_manager.fullDelare)
-        for(key of context['ssr_data']['schema_key']){
-            context['ssr_data'][`${key}_uischema`] = schema_list.fn.schema2uischema(schema_manager.fullDelare[key].schema())
-            context['ssr_data'][`${key}_list`] = await schema_list[key][`get_${key}_list`]({}, {req, res, context})
+function fac_g_product_catagory(){
+    return async function(req, res, context){
+        
+        let g_product_catagory = await schema_list.product_catagory.get_product_catagory_list({where:{parent_code: "-1"}}, {req, res, context})
+        let promises = []
+        for(el of g_product_catagory) {
+            promises.push(schema_list.product_catagory.get_product_catagory_list({where:{parent_code: el.code}}, {req, res, context}))
         }
-        context['schema_key'] = req.params.schema_key || context['ssr_data']['schema_key'][ Object.keys(context['ssr_data']['schema_key'])[0] ]
-        //context['adminpage'] = true
+        let l2 = await Promise.all(promises)
+        .then( async (values) => {
+            values = values.map((x,ii)=>{
+                let parent = g_product_catagory[ii]
+                if(!x.length){
+                    return schema_list.product.get_product_list({where:{product_catagory_code:parent.code}}, {req, res, context})
+                }
+                x.continue = "true"
+                return x
+            })
+            return await Promise.all(values).then((x)=>{
+                return x
+            })
+        })
+        let l2_flat = [];
+        l2_flat = [].concat.apply(l2_flat,l2);
+        l2_flat = l2_flat.filter((x)=>{
+
+            return x.product_catagory_code==undefined 
+        })
+        let l3 = await Promise.all(
+            l2_flat.map((parent)=>{
+            return schema_list.product.get_product_list({where:{product_catagory_code:parent.code}}, {req, res, context})
+        }))
+        .then((value)=>{
+            let value_flat=[];return [].concat.apply(value_flat,value); 
+        })
+        let l3_object = {}
+        l3.forEach((el)=>{
+            l3_object['code'] = el.code
+        })
+        var ii = 0
+        for(el of l2) {
+            for(el_inner of el) {
+                if(el_inner.product_catagory_code == undefined){
+                    el_inner.children = l3.filter(x=>x['product_catagory_code']==el_inner.code)
+                }
+            }
+            
+        }
+        var ii = 0
+        for(el of g_product_catagory) {
+            el.children = l2[ii]
+            ii++
+        }
+        return g_product_catagory
+    }
+}
+app.get('/', factory__express_handle(
+    async function (req, res, context) {
+        context.s_text = s_text;
+        context['route_code'] = "/"
+
+        //let aa = await schema_list.product.get_product_list({where:{product_catagory_code:"1217019508495"}}, {req, res, context})
+
+        let fn_g_product_catagory = fac_g_product_catagory()
+        let g_product_catagory = await fn_g_product_catagory(req, res, context)
+        
+
+        context['ssr_data']['g_product_catagory'] = g_product_catagory
+        context['ssr_data']['product_catagory'] = g_product_catagory
+
+        let csrfToken = req.csrfToken?req.csrfToken():""
+        res.render('v7/index', { csrfToken: csrfToken, context: context })
+    }
+))
+app.get('/about', factory__express_handle(
+    async function (req, res, context) {
+        context.s_text = s_text;
+        context['route_code'] = "/about"
+
+        let fn_g_product_catagory = fac_g_product_catagory()
+        let g_product_catagory = await fn_g_product_catagory(req, res, context)
+
+        context['ssr_data']['g_product_catagory'] = g_product_catagory
+
+        let csrfToken = req.csrfToken?req.csrfToken():""
+        res.render('v7/about', { csrfToken: csrfToken, context: context })
+    }
+))
+app.get('/contact', factory__express_handle(
+    async function (req, res, context) {
+        context.s_text = s_text;
+        context['route_code'] = "/contact"
+
+        let fn_g_product_catagory = fac_g_product_catagory()
+        let g_product_catagory = await fn_g_product_catagory(req, res, context)
+
+        context['ssr_data']['g_product_catagory'] = g_product_catagory
+
+        let csrfToken = req.csrfToken?req.csrfToken():""
+        res.render('v7/contact', { csrfToken: csrfToken, context: context })
+    }
+))
+app.get('/products(/:code)?', factory__express_handle(
+    async function (req, res, context) {
+        context.s_text = s_text;
+
+        context['code'] = req.params.code
+        context['route_code'] = "/products"
+
+        let fn_g_product_catagory = fac_g_product_catagory()
+        let g_product_catagory = await fn_g_product_catagory(req, res, context)
+        context['ssr_data']['g_product_catagory'] = g_product_catagory
+
+        let product_catagory
+        if(!req.params.code){
+            product_catagory = g_product_catagory
+            context['ssr_data']['product_catagory'] = product_catagory
+            context['ssr_data']['product_catagory_child'] =  product_catagory
+        }else{
+            product_catagory = await schema_list.product_catagory.get_product_catagory_list({where:{code: req.params.code}}, {req, res, context})
+            context['ssr_data']['product_catagory'] = product_catagory
+            if(product_catagory[0]){
+                let product_catagory_child = await schema_list.product_catagory.get_product_catagory_list({where:{parent_code:product_catagory[0].code}}, {req, res, context})
+                context['ssr_data']['product_catagory_child'] =  product_catagory_child
+            }
+        }
         
         let csrfToken = req.csrfToken?req.csrfToken():""
-        res.render('v6/index', { csrfToken: csrfToken, context: context })
+        res.render('v7/products', { csrfToken: csrfToken, context: context })
+    }
+))
+app.get('/:code', factory__express_handle(
+    async function (req, res, context) {
+        context.s_text = s_text;
+
+        context['code'] = req.params.code
+        context['route_code'] = "/product"
+
+        let fn_g_product_catagory = fac_g_product_catagory()
+        let g_product_catagory = await fn_g_product_catagory(req, res, context)
+        context['ssr_data']['g_product_catagory'] = g_product_catagory
+        
+        let product = await schema_list.product.get_product_list({where:{code: req.params.code}}, {req, res, context})
+        context['ssr_data']['product'] = product
+
+        let csrfToken = req.csrfToken?req.csrfToken():""
+        res.render('v7/product', { csrfToken: csrfToken, context: context })
     }
 ))
 app.get('/adminee', factory__express_handle(

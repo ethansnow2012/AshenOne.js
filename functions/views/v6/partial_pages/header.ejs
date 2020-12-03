@@ -5,26 +5,34 @@
     
     <% if(context.adminpage) {%>
     <div class="e-header-right">
-        <svg style="display: inline-block;height:30px; width: 30px;">
-            <use href="#svg__avatar">
-            </use>
-        </svg>
-
-        <div class="e-dropdown">
-            <div class="e-dropdown-inner">
-                <div class="e-dropdown-i" id="e-header-logout" onclick="logout()"
-                    style="display: <%= context.logedin?'':'none' %>;">
-                    Log Out
-                </div>
-                <div class="e-dropdown-i" id="e-header-login" style="display: <%= context.logedin?'none':'' %>;">
-                    Log In
-                </div>
-                <div class="e-dropdown-i" id="e-header-signup" onclick="signup()"
-                    style="display: <%= context.logedin?'none':'' %>;">
-                    Sign Up
+        <div class="e-header-right-panel">
+            <select >
+                <option value="tw" <%= context.lang=="tw"?"selected":"" %> >中文語系</option>
+                <option value="en" <%= context.lang=="en"?"selected":"" %> >English</option>
+              </select>
+        </div>
+        <div class="e-dropdown-wrapper">
+            <svg style="display: inline-block;height:30px; width: 30px;">
+                <use href="#svg__avatar">
+                </use>
+            </svg>
+            <div class="e-dropdown">
+                <div class="e-dropdown-inner">
+                    <div class="e-dropdown-i" id="e-header-logout" onclick="logout()"
+                        style="display: <%= context.logedin?'':'none' %>;">
+                        Log Out
+                    </div>
+                    <div class="e-dropdown-i" id="e-header-login" style="display: <%= context.logedin?'none':'' %>;">
+                        Log In
+                    </div>
+                    <div class="e-dropdown-i" id="e-header-signup" onclick="signup()"
+                        style="display: <%= context.logedin?'none':'' %>;">
+                        Sign Up
+                    </div>
                 </div>
             </div>
         </div>
+        
     </div>
     <% }%>
 </div>
@@ -43,13 +51,14 @@
     }
     
     // component script
-    if(document.querySelector(".e-dropdown")){
-        document.querySelectorAll(".e-dropdown").forEach((el) => {
-            el.parentElement.addEventListener("click", function (ev) {
-                el.classList.toggle("on")
+    if(document.querySelector(".e-dropdown-wrapper")){
+        document.querySelectorAll(".e-dropdown-wrapper").forEach((el) => {
+            el.addEventListener("click", function (ev) {
+                el.querySelector(".e-dropdown").classList.toggle("on")
                 var fn_click = function (ev) {
                     if (!ev.target.closest(".e-dropdown.on")) {
-                        el.classList.remove("on")
+                        el.querySelector(".e-dropdown").classList.remove("on")
+                        //ev.target.closest(".e-dropdown.on").classList.remove("on")
                         window.removeEventListener("click", fn_click);
                     }
                 }
@@ -120,4 +129,12 @@
         this.targetEl = null
     }
     var loadingSVG = new _loadingSVG()
+</script>
+<script>
+    document.querySelector(".e-header-right-panel select").addEventListener("change", (ev)=>{
+        let target = ev.target
+        setCookie("lang", target.value, 900)
+
+        location.reload()
+    })
 </script>
